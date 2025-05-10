@@ -735,7 +735,7 @@ class CryptoTrader:
         self.coin_combobox = ttk.Combobox(coin_frame, width=4, values=['BTC', 'ETH', 'SOL'])
         self.coin_combobox.pack(side=tk.LEFT)
         self.coin_combobox.set('BTC')  # 设置默认值
-        
+
         # 配置列权重使按钮均匀分布
         for i in range(4):
             button_frame.grid_columnconfigure(i, weight=1)
@@ -1027,9 +1027,9 @@ class CryptoTrader:
                     below_element_texts.append(below_element_text)
                 
                 # 根据规律直接获取对应位置的值
-                up_price = None
+                up_price = 0.00
                 asks_shares = None
-                down_price = None
+                down_price = 0.00
                 bids_shares = None
                 
                 # 确保above_element_texts至少有4个元素
@@ -1063,12 +1063,6 @@ class CryptoTrader:
                         shares_match = re.search(r'(\d+\.?\d+)', below_element_texts[4])
                         if shares_match:
                             bids_shares = shares_match.group(1)
-                
-                # 增加数据验证
-                if up_price is None or down_price is None:
-                    self.logger.debug("无法获取到价格数据")
-                    continue
-                
                 try:
                     asks_float = float(up_price)
                     bids_float = float(down_price)
@@ -1076,13 +1070,10 @@ class CryptoTrader:
                     # 确保shares值是浮点数
                     if asks_shares is not None:
                         asks_shares = float(asks_shares.replace(',', ''))
-                    else:
-                        self.logger.info(f"未找到asks_shares")
                     
                     if bids_shares is not None:
                         bids_shares = float(bids_shares.replace(',', ''))
-                    else:
-                        self.logger.info(f"未找到bids_shares")
+                    
                     # self.logger.info(f"asks_shares:{asks_shares}, bids_shares:{bids_shares}")
                     return asks_float, bids_float, asks_shares, bids_shares
                 
