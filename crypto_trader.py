@@ -3179,7 +3179,8 @@ class CryptoTrader:
             # 定义要排除的 XPath 属性
             excluded_attrs = ['ACCEPT_BUTTON', 'LOGIN_BUTTON', 'LOGIN_WITH_GOOGLE_BUTTON','HISTORY',
                               'POSITION_SELL_BUTTON', 'POSITION_SELL_YES_BUTTON', 'POSITION_SELL_NO_BUTTON',
-                              'POSITION_UP_LABEL', 'POSITION_DOWN_LABEL', 'POSITION_YES_VALUE', 'POSITION_NO_VALUE'
+                              'POSITION_UP_LABEL', 'POSITION_DOWN_LABEL', 'POSITION_YES_VALUE', 'POSITION_NO_VALUE',
+                              'SEARCH_CONFIRM_BUTTON','SEARCH_INPUT'
                               ]
             # 获取所有 XPath 属性，排除指定的属性
             xpath_attrs = [attr for attr in dir(xpath_config) 
@@ -3220,9 +3221,7 @@ class CryptoTrader:
                                 amount=0,
                                 trade_count=0,
                                 cash_value=subject,
-                                portfolio_value=body,
-                                sell_profit_rate=0,
-                                buy_profit_rate=0
+                                portfolio_value=body
                             )
                 
                 self.logger.warning(f"发现 {len(failed_xpaths)} 个 XPath 定位失败，已发送邮件通知")
