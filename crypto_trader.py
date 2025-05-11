@@ -1808,7 +1808,9 @@ class CryptoTrader:
                 yes2_price = float(self.yes2_price_entry.get())
                 no2_price = float(self.no2_price_entry.get())
                 self.trading = True  # 开始交易
-            
+                
+                self.logger.info(f"asks_shares={asks_shares},bids_shares={bids_shares},asks_price-yes2_price:{round((asks_price - yes2_price), 2)}")
+                self.logger.info(f"1-bids_price:{round((1 - bids_price) - no2_price, 2)}")
                 # 检查Yes2价格匹配
                 if 0 <= round((asks_price - yes2_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
