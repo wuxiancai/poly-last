@@ -111,8 +111,8 @@ class CryptoTrader:
         # 默认买价
         self.default_target_price = 0.52
         # 默认买卖触发最少成交数量
-        self.asks_shares = 0
-        self.bids_shares = 0
+        self.asks_shares = 100
+        self.bids_shares = 200
         # 交易价格冗余
         self.price_premium = 0.02
 
