@@ -111,8 +111,8 @@ class CryptoTrader:
         # 默认买价
         self.default_target_price = 0.52
         # 默认买卖最少成交数量
-        self.asks_shares = 300
-        self.bids_shares = 400
+        self.asks_shares = 200
+        self.bids_shares = 300
         self._amounts_logged = False
         # 在初始化部分添加
         self.stop_event = threading.Event()
@@ -380,7 +380,7 @@ class CryptoTrader:
             settings_container.grid_columnconfigure(i, weight=1)
 
         """设置窗口大小和位置"""
-        window_width = 495
+        window_width = 500
         window_height = 800
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
@@ -394,9 +394,17 @@ class CryptoTrader:
 
         # 创建下拉列和输入框组合控件
         ttk.Label(url_frame, text="WEB:", font=('Arial', 10)).grid(row=0, column=1, padx=5, pady=5)
-        self.url_entry = ttk.Combobox(url_frame, width=46)
+        self.url_entry = ttk.Combobox(url_frame, width=40)
         self.url_entry.grid(row=0, column=2, padx=2, pady=5, sticky="ew")
         
+        # 添加币种选择下拉框
+        coin_frame = ttk.Frame(url_frame)
+        coin_frame.grid(row=0, column=3, padx=1, pady=5)
+        ttk.Label(coin_frame, text="").pack(side=tk.LEFT)
+        self.coin_combobox = ttk.Combobox(coin_frame, width=3, values=['BTC', 'ETH', 'SOL'])
+        self.coin_combobox.pack(side=tk.LEFT)
+        self.coin_combobox.set('BTC')  # 设置默认值
+
         # 从配置文件加载历史记录
         if 'url_history' not in self.config:
             self.config['url_history'] = []
@@ -467,23 +475,33 @@ class CryptoTrader:
         self.trading_pair_label.pack(side=tk.LEFT, padx=5)
         
         # 修改实时价格显示区域
-        price_frame = ttk.LabelFrame(scrollable_frame, text="Price", padding=(5, 5))
+        price_frame = ttk.LabelFrame(scrollable_frame, text="Price and Shares", padding=(5, 5))
         price_frame.pack(padx=5, pady=5, fill="x")
         
         # 创建一个框架来水平排列所有价格信息
         prices_container = ttk.Frame(price_frame)
         prices_container.pack(expand=True)  # 添加expand=True使容器居中
-        
+        shares_container = ttk.Frame(price_frame)
+        shares_container.pack(expand=True)
+
         # Yes实时价格显示
         self.yes_price_label = ttk.Label(prices_container, text="Up: waiting...", 
-                                        font=('Arial', 18), foreground='#9370DB')
+                                        font=('Arial', 18), foreground='red')
         self.yes_price_label.pack(side=tk.LEFT, padx=18)
-        
+        # up shares显示
+        self.up_shares_label = ttk.Label(shares_container, text="Shares: waiting...",
+                                        font=('Arial', 18), foreground='#9370DB')
+        self.up_shares_label.pack(side=tk.LEFT, padx=18)
+
         # No实时价格显示
         self.no_price_label = ttk.Label(prices_container, text="Down: waiting...", 
-                                       font=('Arial', 18), foreground='#9370DB')
+                                       font=('Arial', 18), foreground='red')
         self.no_price_label.pack(side=tk.LEFT, padx=18)
-        
+        # down shares显示
+        self.down_shares_label = ttk.Label(shares_container, text="Shares: waiting...",
+                                        font=('Arial', 18), foreground='#9370DB')
+        self.down_shares_label.pack(side=tk.LEFT, padx=18)
+
         # 最后更新时间 - 靠右下对齐
         self.last_update_label = ttk.Label(price_frame, text="Last-Update: --", 
                                           font=('Arial', 2))
@@ -499,12 +517,12 @@ class CryptoTrader:
         
         # Portfolio显示
         self.portfolio_label = ttk.Label(balance_container, text="Portfolio: waiting...", 
-                                        font=('Arial', 18), foreground='#9370DB') # 修改为绿色
+                                        font=('Arial', 18), foreground='#16A34A') # 修改为绿色
         self.portfolio_label.pack(side=tk.LEFT, padx=18)
         
         # Cash显示
         self.cash_label = ttk.Label(balance_container, text="Cash: waiting...", 
-                                   font=('Arial', 18), foreground='#9370DB') # 修改为绿色
+                                   font=('Arial', 18), foreground='#16A34A') # 修改为绿色
         self.cash_label.pack(side=tk.LEFT, padx=18)
         
         # 最后更新时间 - 靠右下对齐
@@ -728,14 +746,6 @@ class CryptoTrader:
                                            command=self.click_sell_confirm_button)
         self.sell_confirm_button.grid(row=0, column=2, padx=2, pady=5)
         
-        # 添加币种选择下拉框
-        coin_frame = ttk.Frame(button_frame)
-        coin_frame.grid(row=1, column=0, padx=2, pady=5)
-        ttk.Label(coin_frame, text="Coin:", font=('Arial', 14)).pack(side=tk.LEFT)
-        self.coin_combobox = ttk.Combobox(coin_frame, width=4, values=['BTC', 'ETH', 'SOL'])
-        self.coin_combobox.pack(side=tk.LEFT)
-        self.coin_combobox.set('BTC')  # 设置默认值
-
         # 配置列权重使按钮均匀分布
         for i in range(4):
             button_frame.grid_columnconfigure(i, weight=1)
@@ -911,7 +921,7 @@ class CryptoTrader:
                 try:
                     self.check_balance()
                     self.check_prices()
-                    time.sleep(2)
+                    time.sleep(1)
                 except Exception as e:
                     if not self.stop_event.is_set():  # 仅在未停止时记录错误
                         self.logger.error(f"监控失败: {str(e)}")
@@ -1124,7 +1134,8 @@ class CryptoTrader:
                     try:
                         up_price = float(above_price)
                         down_price = 100 - float(below_price)
-
+                        up_shares = float(asks_shares)
+                        down_shares = float(bids_shares)
                         up_price_dollar = up_price / 100
                         down_price_dollar = down_price / 100
                         
@@ -1136,6 +1147,14 @@ class CryptoTrader:
                         self.no_price_label.config(
                             text=f"Down: {down_price:.2f}¢ (${down_price_dollar:.2f})",
                             foreground='red'
+                        )
+                        self.up_shares_label.config(
+                            text=f"Up Shares: {up_shares:.2f}",
+                            foreground='#9370DB'
+                        )
+                        self.down_shares_label.config(
+                            text=f"Down Shares: {down_shares:.2f}",
+                            foreground='#9370DB'
                         )
                         # 更新最后更新时间
                         current_time = datetime.now().strftime('%H:%M:%S')
@@ -3082,50 +3101,6 @@ class CryptoTrader:
                 time.sleep(retry_delay)
                 self.driver.refresh()
         return False
-
-    def change_url(self):
-        """根据当前时间,修改url"""
-        self.logger.info("开始切换url")
-        self.stop_refresh_page()
-        self.stop_url_monitoring()
-        
-        try:
-            base_url = self.url_entry.get()
-            on_index = base_url.find("on-")
-
-            if on_index != -1:
-                # "on-"的结束位置
-                split_position = on_index + 3
-                
-                # 分割成两部分
-                first_part = base_url[:split_position]  # 从开始到"on-"(包含)
-                second_part = base_url[split_position:]  # "on-"之后的部分
-
-            today = datetime.now().strftime("%B-%-d").lower() # macOS/Linux
-
-            new_url = first_part + today
-            self.url_entry.delete(0, tk.END)
-            self.url_entry.insert(0, new_url)
-            self.config['website']['url'] = new_url
-            self.save_config()
-            self.target_url = self.url_entry.get()
-            self.logger.info(f"\033[34m✅ {self.target_url}:已插入主界面,保存到配置文件\033[0m")
-            self.driver.get(self.target_url)
-            # 保存当前窗口句柄
-            current_handle = self.driver.current_window_handle
-            # 关闭前面的窗口
-            self.driver.switch_to.window(self.driver.window_handles[0])
-            self.close_windows()
-            # 切换回当前窗口
-            self.driver.switch_to.window(current_handle)
-            # 获取并设置金额
-            self.set_yes_no_cash()
-            self.start_url_monitoring()
-            self.refresh_page()
-        except Exception as e:
-            self.logger.error(f"切换url失败: {str(e)}")
-        finally:
-            self.schedule_00_02_change_url()
       
     def _find_element_with_retry(self, xpaths, timeout=3, silent=False):
         """优化版XPATH元素查找(增强空值处理)"""
@@ -3282,6 +3257,9 @@ class CryptoTrader:
                         self.url_entry.insert(0, coin_new_weekly_url)
 
                         self.target_url = self.url_entry.get()
+                        new_url = self.url_entry.get()
+                        pair = re.search(r'event/([^?]+)', new_url)
+                        self.trading_pair_label.config(text=pair.group(1))
                         self.logger.info(f"\033[34m✅ {self.target_url} 已插入到主界面上\033[0m")
                         self.start_url_monitoring()
                         self.refresh_page()
@@ -3391,6 +3369,9 @@ class CryptoTrader:
                         self.url_entry.delete(0, tk.END)
                         self.url_entry.insert(0, new_weekly_url)
                         self.target_url = self.url_entry.get()
+                        new_url = self.url_entry.get()
+                        pair = re.search(r'event/([^?]+)', new_url)
+                        self.trading_pair_label.config(text=pair.group(1))
                         self.logger.info(f"✅ {self.target_url}:已插入到主界面上")
 
                         self.target_url_window = self.driver.current_window_handle
