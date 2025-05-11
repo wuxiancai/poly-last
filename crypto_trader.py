@@ -1057,7 +1057,7 @@ class CryptoTrader:
                     if re.match(r'^\d+\.?\d*$', above_element_texts[2]):
                         asks_shares = above_element_texts[2]
                     elif re.search(r'(\d+\.?\d+)', above_element_texts[2]):
-                        shares_match = re.search(r'(\d+\.?\d+)', above_element_texts[2])
+                        shares_match = re.search(r'(\d+[,\.]?\d*)', above_element_texts[2])
                         if shares_match:
                             asks_shares = shares_match.group(1)
                 
@@ -1073,7 +1073,7 @@ class CryptoTrader:
                     if re.match(r'^\d+\.?\d*$', below_element_texts[4]):
                         bids_shares = below_element_texts[4]
                     elif re.search(r'(\d+\.?\d+)', below_element_texts[4]):
-                        shares_match = re.search(r'(\d+\.?\d+)', below_element_texts[4])
+                        shares_match = re.search(r'(\d+[,\.]?\d*)', below_element_texts[4])
                         if shares_match:
                             bids_shares = shares_match.group(1)
                 try:
