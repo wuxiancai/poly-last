@@ -1231,7 +1231,7 @@ class CryptoTrader:
                 self.balance_update_label.config(text=f"最后更新: {current_time}")  
                 
             except Exception as e:
-                self.logger.error(f"获取资金信息失败: {str(e)}")
+                self.logger.info(f"获取资金信息失败: {str(e)}")
                 self.portfolio_label.config(text="Portfolio: Fail")
                 self.cash_label.config(text="Cash: Fail")
                 self.driver.refresh()
@@ -1658,7 +1658,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -1666,7 +1666,7 @@ class CryptoTrader:
                 yes1_price = float(self.yes1_price_entry.get())
                 no1_price = float(self.no1_price_entry.get())
                 self.trading = True  # 开始交易
-                  
+                
                 # 检查Yes1价格匹配
                 if 0 <= round((asks_price - yes1_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
@@ -1803,7 +1803,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -1927,7 +1927,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -2051,7 +2051,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -2181,7 +2181,7 @@ class CryptoTrader:
                 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and asks_price > 10 and bids_price is not None and bids_price > 10:
+            if asks_price is not None and bids_price is not None and bids_price > 4:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -2238,7 +2238,7 @@ class CryptoTrader:
 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and (1 - asks_price) > 10 and bids_price is not None and bids_price > 10:
+            if asks_price is not None and asks_price < 98 and bids_price is not None:
                 bids_price = round(bids_price / 100, 2)
                 asks_price = round(asks_price / 100, 2)
                 
@@ -2725,11 +2725,11 @@ class CryptoTrader:
         """
         验证交易是否成功完成Returns:bool: 交易是否成功
         """
-        max_retries = 3
-        retry_delay = 2
-        
+        max_retries = 2
+        retry_delay = 1
+        time.sleep(1)
         for attempt in range(max_retries):
-            time.sleep(1)
+            
             try:
                 # 首先验证浏览器状态
                 if not self.driver:
@@ -2772,11 +2772,10 @@ class CryptoTrader:
         Returns:
         bool: 交易是否成功
         """
-        max_retries = 3
-        retry_delay = 2
-        
+        max_retries = 2
+        retry_delay = 1
+        time.sleep(1)
         for attempt in range(max_retries):
-            time.sleep(1)
             try:
                 # 首先验证浏览器状态
                 if not self.driver:
@@ -2805,7 +2804,7 @@ class CryptoTrader:
                     return True, self.sell_no_amount
                 return False        
             except Exception as e:
-                self.logger.warning(f"Verify_sold_no执行失败: {str(e)}")
+                self.logger.info(f"Verify_sold_no执行失败: {str(e)}")
                 if attempt < max_retries - 1:
                     self.logger.info(f"等待{retry_delay}秒后重试...")
                     time.sleep(retry_delay)
@@ -3066,15 +3065,15 @@ class CryptoTrader:
                         self.logger.info(f"找到了Up持仓标签: {position_label_up.text}")
                         return True
                     else:
-                        self.logger.debug("未找到Up持仓标签")
-                        return False    
+                        self.logger.info("USE FIND-element,未找到Up持仓标签")
+                        return False
                 except NoSuchElementException:
                     position_label_up = self._find_element_with_retry(XPathConfig.POSITION_UP_LABEL, timeout=3, silent=True)
                     if position_label_up is not None and position_label_up:
                         self.logger.info(f"找到了Up持仓标签: {position_label_up.text}")
                         return True
                     else:
-                        self.logger.debug("未找到Up持仓标签")
+                        self.logger.info("use with-retry,未找到Up持仓标签")
                         return False
                          
             except TimeoutException:
@@ -3106,18 +3105,18 @@ class CryptoTrader:
                     position_label_down = None
                     position_label_down = self.driver.find_element(By.XPATH, XPathConfig.POSITION_DOWN_LABEL[0])
                     if position_label_down is not None and position_label_down:
-                        self.logger.info(f"找到了Down持仓标签: {position_label_down.text}")
+                        self.logger.info(f"use find-element,找到了Down持仓标签: {position_label_down.text}")
                         return True
                     else:
-                        self.logger.debug("未找到Down持仓标签")
+                        self.logger.info("use find-element,未找到Down持仓标签")
                         return False
                 except NoSuchElementException:
                     position_label_down = self._find_element_with_retry(XPathConfig.POSITION_DOWN_LABEL, timeout=3, silent=True)
                     if position_label_down is not None and position_label_down:
-                        self.logger.info(f"找到了Down持仓标签: {position_label_down.text}")
+                        self.logger.info(f"use with-retry,找到了Down持仓标签: {position_label_down.text}")
                         return True
                     else:
-                        self.logger.debug("未找到Down持仓标签")
+                        self.logger.info("use with-retry,未找到Down持仓标签")
                         return False
                                
             except TimeoutException:
