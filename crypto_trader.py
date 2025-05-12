@@ -112,7 +112,7 @@ class CryptoTrader:
         self.default_target_price = 0.52
         # 默认买卖触发最少成交数量
         self.asks_shares = 100
-        self.bids_shares = 150
+        self.bids_shares = 100
         # 交易价格冗余
         self.price_premium = 0.02
 
@@ -2092,7 +2092,7 @@ class CryptoTrader:
                             self.yes5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.no5_price_entry = self.no_frame.grid_slaves(row=8, column=1)[0]
                             self.no5_price_entry.delete(0, tk.END)
-                            self.no5_price_entry.insert(0, "0.52")
+                            self.no5_price_entry.insert(0, "0.51")
                             self.no5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.buy_yes4_amount = float(self.yes4_amount_entry.get())
                             # 增加交易次数
@@ -2141,7 +2141,7 @@ class CryptoTrader:
                             # 设置 Yes5和No5价格为0.98
                             self.yes5_price_entry = self.yes_frame.grid_slaves(row=8, column=1)[0]
                             self.yes5_price_entry.delete(0, tk.END)
-                            self.yes5_price_entry.insert(0, "0.52")
+                            self.yes5_price_entry.insert(0, "0.51")
                             self.yes5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.no5_price_entry = self.no_frame.grid_slaves(row=8, column=1)[0]
                             self.no5_price_entry.delete(0, tk.END)
