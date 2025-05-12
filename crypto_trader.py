@@ -1057,7 +1057,7 @@ class CryptoTrader:
                         price_match = re.search(r'(\d+\.?\d*)¢', above_element_texts[3])
                         if price_match:
                             up_price = price_match.group(1)
-                            self.logger.info(f"\033[34m✅ 成功获取up_price: {up_price}\033[0m")
+                            #self.logger.info(f"\033[34m✅ 成功获取up_price: {up_price}\033[0m")
                     # 提取第3个元素作为asks_shares
                     if re.match(r'^\d+\.?\d*$', above_element_texts[2]):
                         asks_shares = above_element_texts[2]
@@ -1073,7 +1073,7 @@ class CryptoTrader:
                         price_match = re.search(r'(\d+\.?\d*)¢', below_element_texts[3])
                         if price_match:
                             down_price = price_match.group(1)
-                            self.logger.info(f"\033[34m✅ 成功获取down_price: {down_price}\033[0m")
+                            #self.logger.info(f"\033[34m✅ 成功获取down_price: {down_price}\033[0m")
                     # 提取第5个元素作为bids_shares
                     if re.match(r'^\d+\.?\d*$', below_element_texts[4]):
                         bids_shares = below_element_texts[4]
