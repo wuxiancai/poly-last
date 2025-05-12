@@ -112,7 +112,7 @@ class CryptoTrader:
         self.default_target_price = 0.52
         # 默认买卖触发最少成交数量
         self.asks_shares = 100
-        self.bids_shares = 200
+        self.bids_shares = 150
         # 交易价格冗余
         self.price_premium = 0.02
 
@@ -1809,8 +1809,6 @@ class CryptoTrader:
                 no2_price = float(self.no2_price_entry.get())
                 self.trading = True  # 开始交易
                 
-                self.logger.info(f"asks_shares={asks_shares},bids_shares={bids_shares},asks_price-yes2_price:{round((asks_price - yes2_price), 2)}")
-                self.logger.info(f"1-bids_price:{round((1 - bids_price) - no2_price, 2)}")
                 # 检查Yes2价格匹配
                 if 0 <= round((asks_price - yes2_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
@@ -2216,13 +2214,18 @@ class CryptoTrader:
                             if no_entry:
                                 no_entry.delete(0, tk.END)
                                 no_entry.insert(0, "0.00")
-
+                        
+                        break
+                    if bids_price < 60.00:
                         # 在所有操作完成后,重置交易
                         self.root.after(1000, self.reset_trade)
-                        break
+                    elif bids_price > 80.00:
+                        self.root.after(1000, self.reset_trade_98)
+
                     else:
                         self.logger.warning("卖出sell_yes验证失败,重试")
                         time.sleep(2)
+                
         except Exception as e:
             self.logger.error(f"Sell_yes执行失败: {str(e)}")
             self.update_status(f"Sell_yes执行失败: {str(e)}")
@@ -2272,18 +2275,75 @@ class CryptoTrader:
                             if no_entry:
                                 no_entry.delete(0, tk.END)
                                 no_entry.insert(0, "0.00")
+                        
+                        break
+                    if bids_price < 60.00:
                         # 在所有操作完成后,重置交易
                         self.root.after(1000, self.reset_trade)
-                        break
+                    elif bids_price > 80.00:
+                        self.root.after(1000, self.reset_trade_98)
+
                     else:
                         self.logger.warning("卖出sell_no验证失败,重试")
                         time.sleep(2)
-            
+                
         except Exception as e:
             self.logger.error(f"Sell_no执行失败: {str(e)}")
             self.update_status(f"Sell_no执行失败: {str(e)}")
         finally:
             self.trading = False
+
+    def reset_trade(self):
+        """重置交易"""
+        # 在所有操作完成后,重置交易
+        time.sleep(2)
+        self.set_yes_no_cash()
+        
+        # 检查属性是否存在，如果不存在则使用默认值
+        yes5_price = getattr(self, 'yes5_target_price', 0)
+        no5_price = getattr(self, 'no5_target_price', 0)
+
+        if (yes5_price == 0.98) or (no5_price == 0.98):
+            self.reset_trade_count = 0
+        else:
+            self.reset_trade_count += 1
+        
+        self.sell_count = 0
+        self.trade_count = 0
+        # 重置Yes1和No1价格为0.53
+        self.set_yes_no_default_target_price()
+        self.reset_count_label.config(text=str(self.reset_trade_count))
+        self.logger.info(f"第\033[32m{self.reset_trade_count}\033[0m次重置交易")
+
+    def reset_trade_98(self):
+        """重置交易"""
+        # 在所有操作完成后,重置交易
+        time.sleep(2)
+        self.set_yes_no_cash()
+        
+        # 检查属性是否存在，如果不存在则使用默认值
+        yes5_price = getattr(self, 'yes5_target_price', 100)
+        no5_price = getattr(self, 'no5_target_price', 100)
+
+        self.reset_trade_count = 0
+        
+        self.sell_count = 0
+        self.trade_count = 0
+        # 重置Yes1和No1价格为0.52
+        self.set_yes_no_default_target_price()
+        # 重置yes2-5和no2-5的价格
+        for i in range(2,6):  # 2-5
+            yes_entry = getattr(self, f'yes{i}_price_entry', None)
+            no_entry = getattr(self, f'no{i}_price_entry', None)
+            if yes_entry:
+                yes_entry.delete(0, tk.END)
+                yes_entry.insert(0, "100.00")
+            if no_entry:
+                no_entry.delete(0, tk.END)
+                no_entry.insert(0, "100.00")
+
+        self.reset_count_label.config(text=str(self.reset_trade_count))
+        self.logger.info(f"第\033[32m{self.reset_trade_count}\033[0m次重置交易")
 
     def only_sell_yes(self):
         """只卖出YES"""
@@ -3459,27 +3519,6 @@ class CryptoTrader:
             self.logger.error(f"查找并点击今天日期卡片失败: {str(e)}")
             return False
 
-    def reset_trade(self):
-        """重置交易"""
-        # 在所有操作完成后,重置交易
-        time.sleep(2)
-        self.set_yes_no_cash()
-        
-        # 检查属性是否存在，如果不存在则使用默认值
-        yes5_price = getattr(self, 'yes5_target_price', 0)
-        no5_price = getattr(self, 'no5_target_price', 0)
-
-        if (yes5_price == 0.98) or (no5_price == 0.98):
-            self.reset_trade_count = 0
-        else:
-            self.reset_trade_count += 1
-        
-        self.sell_count = 0
-        self.trade_count = 0
-        # 重置Yes1和No1价格为0.53
-        self.set_yes_no_default_target_price()
-        self.reset_count_label.config(text=str(self.reset_trade_count))
-        self.logger.info(f"第\033[32m{self.reset_trade_count}\033[0m次重置交易")
 
     def run(self):
         """启动程序"""
