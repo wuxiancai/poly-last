@@ -873,7 +873,7 @@ class CryptoTrader:
             self._show_error_and_reset(error_msg)
 
     def _show_error_and_reset(self, error_msg):
-        """显示错误并置按钮状态"""
+        """显示错误并重置按钮状态"""
         self.update_status(error_msg)
         # 用after方法确保在线程中执行GUI操作
         self.root.after(0, lambda: messagebox.showerror("错误", error_msg))
@@ -935,7 +935,7 @@ class CryptoTrader:
             self.stop_monitoring()
     
     def restart_browser(self):
-        # 自动修复: 尝试重新连接浏览器
+        """自动修复: 尝试重新连接浏览器"""
         try:
             self.logger.info("正在尝试自动修复CHROME浏览器...")
             
@@ -956,7 +956,10 @@ class CryptoTrader:
                     # 重新初始化driver
                     chrome_options = Options()
                     chrome_options.debugger_address = "127.0.0.1:9222"
+                    chrome_options.add_argument('--no-sandbox')
+                    chrome_options.add_argument('--disable-dev-shm-usage')
                     self.driver = webdriver.Chrome(options=chrome_options)
+                    self.update_status("成功连接到浏览器")
                     
                     # 验证连接
                     self.driver.get('chrome://version/')  # 测试连接
@@ -1002,15 +1005,12 @@ class CryptoTrader:
                 # 使用 XPath 定位并点击 google 按钮
                 google_button = self._find_element_with_retry(XPathConfig.LOGIN_WITH_GOOGLE_BUTTON, timeout=3, silent=True)
                 google_button.click()
-                time.sleep(5)
-
-                self.driver.get(target_url)
-                time.sleep(2)
+                time.sleep(25)
 
                 self.start_url_monitoring()
                 self.start_login_monitoring()
                 self.refresh_page()
-                self.schedule_00_02_change_url()
+                self.schedule_auto_find_coin()
         except Exception as e:
             self.logger.error(f"自动修复失败: {e}")
     
@@ -1019,8 +1019,13 @@ class CryptoTrader:
         for attempt in range(retry_times):
             try:
                 # 定位 Spread 元素
-                keyword_element = self.driver.find_element(By.XPATH, XPathConfig.SPREAD[0])
-                container = keyword_element.find_element(By.XPATH, './ancestor::div[3]') # 必须是 3 层 DIV
+                try:
+                    keyword_element = self.driver.find_element(By.XPATH, XPathConfig.SPREAD[0])
+                    container = keyword_element.find_element(By.XPATH, './ancestor::div[3]') # 必须是 3 层 DIV
+                except NoSuchElementException:
+                    # 如果找不到元素，静默处理，不记录错误日志
+                    time.sleep(1)
+                    continue
                 # 取兄弟节点
                 above_elements = self.driver.execute_script(
                     'let e=arguments[0],r=[];while(e=e.previousElementSibling)r.push(e);return r;', container)
@@ -1442,9 +1447,7 @@ class CryptoTrader:
             # 重新建立连接
             chrome_options = Options()
             chrome_options.debugger_address = "127.0.0.1:9222"
-            chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument('--disable-dev-shm-usage')
-            
             self.driver = webdriver.Chrome(options=chrome_options)
             self.logger.info("\033[34m✅ 已重新连接到浏览器\033[0m")
             return True
@@ -1655,7 +1658,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0:
+            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -1800,7 +1803,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0:
+            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
                 asks_price = asks_price / 100
                 bids_price = bids_price / 100
                 
@@ -1924,7 +1927,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0:
+            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
                 asks_price = asks_price / 100
                 bids_price = bids_price / 100
                 
@@ -2048,7 +2051,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0:
+            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
                 asks_price = asks_price / 100
                 bids_price = bids_price / 100
                 
@@ -2178,7 +2181,7 @@ class CryptoTrader:
                 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0:
+            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0.1:
                 asks_price = asks_price / 100
                 bids_price = bids_price / 100
                 
@@ -2214,14 +2217,9 @@ class CryptoTrader:
                             if no_entry:
                                 no_entry.delete(0, tk.END)
                                 no_entry.insert(0, "0.00")
-                        
-                        break
-                    if bids_price < 60.00:
                         # 在所有操作完成后,重置交易
                         self.root.after(1000, self.reset_trade)
-                    elif bids_price > 80.00:
-                        self.root.after(1000, self.reset_trade_98)
-
+                        break
                     else:
                         self.logger.warning("卖出sell_yes验证失败,重试")
                         time.sleep(2)
@@ -2240,7 +2238,7 @@ class CryptoTrader:
 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0:
+            if asks_price is not None and (1 - asks_price) > 0.1 and bids_price is not None and bids_price > 0:
                 bids_price = bids_price / 100
                 asks_price = asks_price / 100
                 
@@ -2275,14 +2273,9 @@ class CryptoTrader:
                             if no_entry:
                                 no_entry.delete(0, tk.END)
                                 no_entry.insert(0, "0.00")
-                        
-                        break
-                    if bids_price < 60.00:
                         # 在所有操作完成后,重置交易
                         self.root.after(1000, self.reset_trade)
-                    elif bids_price > 80.00:
-                        self.root.after(1000, self.reset_trade_98)
-
+                        break
                     else:
                         self.logger.warning("卖出sell_no验证失败,重试")
                         time.sleep(2)
@@ -2312,36 +2305,6 @@ class CryptoTrader:
         self.trade_count = 0
         # 重置Yes1和No1价格为0.53
         self.set_yes_no_default_target_price()
-        self.reset_count_label.config(text=str(self.reset_trade_count))
-        self.logger.info(f"第\033[32m{self.reset_trade_count}\033[0m次重置交易")
-
-    def reset_trade_98(self):
-        """重置交易"""
-        # 在所有操作完成后,重置交易
-        time.sleep(2)
-        self.set_yes_no_cash()
-        
-        # 检查属性是否存在，如果不存在则使用默认值
-        yes5_price = getattr(self, 'yes5_target_price', 100)
-        no5_price = getattr(self, 'no5_target_price', 100)
-
-        self.reset_trade_count = 0
-        
-        self.sell_count = 0
-        self.trade_count = 0
-        # 重置Yes1和No1价格为0.52
-        self.set_yes_no_default_target_price()
-        # 重置yes2-5和no2-5的价格
-        for i in range(2,6):  # 2-5
-            yes_entry = getattr(self, f'yes{i}_price_entry', None)
-            no_entry = getattr(self, f'no{i}_price_entry', None)
-            if yes_entry:
-                yes_entry.delete(0, tk.END)
-                yes_entry.insert(0, "100.00")
-            if no_entry:
-                no_entry.delete(0, tk.END)
-                no_entry.insert(0, "100.00")
-
         self.reset_count_label.config(text=str(self.reset_trade_count))
         self.logger.info(f"第\033[32m{self.reset_trade_count}\033[0m次重置交易")
 
