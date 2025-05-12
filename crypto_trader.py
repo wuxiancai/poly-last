@@ -111,8 +111,8 @@ class CryptoTrader:
         # 默认买价
         self.default_target_price = 0.52
         # 默认买卖触发最少成交数量
-        self.asks_shares = 100
-        self.bids_shares = 100
+        self.asks_shares = 99
+        self.bids_shares = 99
         # 交易价格冗余
         self.price_premium = 0.02
 
@@ -1057,7 +1057,7 @@ class CryptoTrader:
                         price_match = re.search(r'(\d+\.?\d*)¢', above_element_texts[3])
                         if price_match:
                             up_price = price_match.group(1)
-                    
+                            self.logger.info(f"\033[34m✅ 成功获取up_price: {up_price}\033[0m")
                     # 提取第3个元素作为asks_shares
                     if re.match(r'^\d+\.?\d*$', above_element_texts[2]):
                         asks_shares = above_element_texts[2]
@@ -1073,7 +1073,7 @@ class CryptoTrader:
                         price_match = re.search(r'(\d+\.?\d*)¢', below_element_texts[3])
                         if price_match:
                             down_price = price_match.group(1)
-                    
+                            self.logger.info(f"\033[34m✅ 成功获取down_price: {down_price}\033[0m")
                     # 提取第5个元素作为bids_shares
                     if re.match(r'^\d+\.?\d*$', below_element_texts[4]):
                         bids_shares = below_element_texts[4]
@@ -1103,7 +1103,7 @@ class CryptoTrader:
                 time.sleep(1)  # 稍等一下再试
                 continue
             except Exception as e:
-                self.logger.debug(f"其他异常: {e}")
+                self.logger.logger.info(f"其他异常: {e}")
                 time.sleep(2)
                 if attempt < retry_times - 1:
                     time.sleep(2)
@@ -1658,7 +1658,7 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -1803,9 +1803,9 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
-                asks_price = asks_price / 100
-                bids_price = bids_price / 100
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
+                asks_price = round(asks_price / 100, 2)
+                bids_price = round(bids_price / 100, 2)
                 
                 # 获Yes2和No2的价格输入框
                 yes2_price = float(self.yes2_price_entry.get())
@@ -1927,9 +1927,9 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
-                asks_price = asks_price / 100
-                bids_price = bids_price / 100
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
+                asks_price = round(asks_price / 100, 2)
+                bids_price = round(bids_price / 100, 2)
                 
                 # 获取Yes3和No3的价格输入框
                 yes3_price = float(self.yes3_price_entry.get())
@@ -2051,9 +2051,9 @@ class CryptoTrader:
         try:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price > 0.2 and bids_price is not None and bids_price > 0.2:
-                asks_price = asks_price / 100
-                bids_price = bids_price / 100
+            if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price > 20:
+                asks_price = round(asks_price / 100, 2)
+                bids_price = round(bids_price / 100, 2)
                 
                 # 获取Yes4和No4的价格输入框
                 yes4_price = float(self.yes4_price_entry.get())
@@ -2181,9 +2181,9 @@ class CryptoTrader:
                 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and asks_price > 0 and bids_price is not None and bids_price > 0.1:
-                asks_price = asks_price / 100
-                bids_price = bids_price / 100
+            if asks_price is not None and asks_price > 10 and bids_price is not None and bids_price > 10:
+                asks_price = round(asks_price / 100, 2)
+                bids_price = round(bids_price / 100, 2)
                 
                 # 获取Yes5价格
                 yes5_price = float(self.yes5_price_entry.get())
@@ -2238,9 +2238,9 @@ class CryptoTrader:
 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and (1 - asks_price) > 0.1 and bids_price is not None and bids_price > 0:
-                bids_price = bids_price / 100
-                asks_price = asks_price / 100
+            if asks_price is not None and (1 - asks_price) > 10 and bids_price is not None and bids_price > 10:
+                bids_price = round(bids_price / 100, 2)
+                asks_price = round(asks_price / 100, 2)
                 
                 # 获取No5价格
                 no5_price = float(self.no5_price_entry.get())
