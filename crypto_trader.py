@@ -1082,8 +1082,8 @@ class CryptoTrader:
                         if shares_match:
                             bids_shares = shares_match.group(1)
                 try:
-                    asks_float = round(float(up_price), 2)
-                    bids_float = round(float(down_price), 2)
+                    asks_float = round(float(up_price) / 100, 2)
+                    bids_float = round(float(down_price) / 100, 2)
                     
                     # 确保shares值是浮点数
                     if asks_shares is not None:
@@ -1659,9 +1659,6 @@ class CryptoTrader:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
             if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
-                asks_price = round(asks_price / 100, 2)
-                bids_price = round(bids_price / 100, 2)
-                
                 # 获取Yes1和No1的GUI界面上的价格
                 yes1_price = float(self.yes1_price_entry.get())
                 no1_price = float(self.no1_price_entry.get())
@@ -1804,8 +1801,6 @@ class CryptoTrader:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
             if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
-                asks_price = round(asks_price / 100, 2)
-                bids_price = round(bids_price / 100, 2)
                 
                 # 获Yes2和No2的价格输入框
                 yes2_price = float(self.yes2_price_entry.get())
@@ -1928,8 +1923,6 @@ class CryptoTrader:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
             if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
-                asks_price = round(asks_price / 100, 2)
-                bids_price = round(bids_price / 100, 2)
                 
                 # 获取Yes3和No3的价格输入框
                 yes3_price = float(self.yes3_price_entry.get())
@@ -2052,8 +2045,6 @@ class CryptoTrader:
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
             if asks_price is not None and asks_price > 20 and bids_price is not None and bids_price < 97:
-                asks_price = round(asks_price / 100, 2)
-                bids_price = round(bids_price / 100, 2)
                 
                 # 获取Yes4和No4的价格输入框
                 yes4_price = float(self.yes4_price_entry.get())
@@ -2181,9 +2172,7 @@ class CryptoTrader:
                 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and bids_price is not None and bids_price > 10:
-                asks_price = round(asks_price / 100, 2)
-                bids_price = round(bids_price / 100, 2)
+            if asks_price is not None and bids_price is not None and (bids_price > 0.1):
                 
                 # 获取Yes5价格
                 yes5_price = float(self.yes5_price_entry.get())
@@ -2237,11 +2226,8 @@ class CryptoTrader:
                 self.restart_browser()  
 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
-                
-            if asks_price is not None and asks_price < 90 and bids_price is not None:
-                bids_price = round(bids_price / 100, 2)
-                asks_price = round(asks_price / 100, 2)
-                
+            
+            if asks_price is not None and (asks_price < 0.9) and bids_price is not None:
                 # 获取No5价格
                 no5_price = float(self.no5_price_entry.get())
                 self.trading = True  # 开始交易
@@ -3240,7 +3226,7 @@ class CryptoTrader:
         now = datetime.now()
         self.logger.info(f"当前时间: {now}")
         # 计算下一个3点2分的时间
-        next_run = now.replace(hour=1, minute=5, second=0, microsecond=0)
+        next_run = now.replace(hour=0, minute=15, second=0, microsecond=0)
         if now >= next_run:
             next_run += timedelta(days=1)
         
