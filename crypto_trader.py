@@ -2181,7 +2181,7 @@ class CryptoTrader:
                 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
-            if asks_price is not None and bids_price is not None and bids_price > 4:
+            if asks_price is not None and bids_price is not None and bids_price > 10:
                 asks_price = round(asks_price / 100, 2)
                 bids_price = round(bids_price / 100, 2)
                 
@@ -2238,7 +2238,7 @@ class CryptoTrader:
 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
                 
-            if asks_price is not None and asks_price < 98 and bids_price is not None:
+            if asks_price is not None and asks_price < 90 and bids_price is not None:
                 bids_price = round(bids_price / 100, 2)
                 asks_price = round(asks_price / 100, 2)
                 
