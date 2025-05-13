@@ -1141,7 +1141,7 @@ class CryptoTrader:
                 if above_price is not None and below_price is not None:
                     try:
                         up_price = float(above_price)
-                        down_price = 100 - float(below_price)
+                        down_price = 1 - float(below_price)
                         up_shares = float(asks_shares)
                         down_shares = float(bids_shares)
                         up_price_dollar = up_price / 100
@@ -2233,7 +2233,7 @@ class CryptoTrader:
                 self.trading = True  # 开始交易
             
                 # 检查No5价格匹配
-                if 0 <= round((1 - asks_price) - no5_price, 2) <= self.price_premium and (bids_shares > self.bids_shares):
+                if 0 <= round(1 - asks_price - no5_price, 2) <= self.price_premium and (bids_shares > self.bids_shares):
                     self.logger.info("Down 5价格匹配,执行自动卖出")
 
                     self.no5_target_price = no5_price
@@ -2267,8 +2267,8 @@ class CryptoTrader:
                         time.sleep(2)
                 
         except Exception as e:
-            self.logger.error(f"Sell_no执行失败: {str(e)}")
-            self.update_status(f"Sell_no执行失败: {str(e)}")
+            self.logger.info(f"Sell_no执行失败: {str(e)}")
+            
         finally:
             self.trading = False
 
