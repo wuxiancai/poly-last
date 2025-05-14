@@ -2227,7 +2227,7 @@ class CryptoTrader:
 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
             
-            if asks_price is not None and (asks_price < 0.9) and bids_price is not None:
+            if asks_price is not None and (0 < asks_price < 0.9) and bids_price is not None:
                 # 获取No5价格
                 no5_price = float(self.no5_price_entry.get())
                 self.trading = True  # 开始交易
