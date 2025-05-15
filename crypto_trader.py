@@ -2282,14 +2282,14 @@ class CryptoTrader:
         yes5_price = getattr(self, 'yes5_target_price', 0)
         no5_price = getattr(self, 'no5_target_price', 0)
 
-        if (yes5_price == 0.98) or (no5_price == 0.98):
+        if (yes5_price > 0.9) or (no5_price > 0.9):
             self.reset_trade_count = 0
         else:
             self.reset_trade_count += 1
         
         self.sell_count = 0
         self.trade_count = 0
-        # 重置Yes1和No1价格为0.53
+        # 重置Yes1和No1价格为0.52
         self.set_yes_no_default_target_price()
         self.reset_count_label.config(text=str(self.reset_trade_count))
         self.logger.info(f"第\033[32m{self.reset_trade_count}\033[0m次重置交易")
