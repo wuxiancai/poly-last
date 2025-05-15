@@ -956,6 +956,7 @@ class CryptoTrader:
                     # 重新初始化driver
                     chrome_options = Options()
                     chrome_options.debugger_address = "127.0.0.1:9222"
+                    chrome_options.add_argument('--no-sandbox')
                     chrome_options.add_argument('--disable-dev-shm-usage')
                     self.driver = webdriver.Chrome(options=chrome_options)
                     self.update_status("成功连接到浏览器")
@@ -2281,7 +2282,7 @@ class CryptoTrader:
         yes5_price = getattr(self, 'yes5_target_price', 0)
         no5_price = getattr(self, 'no5_target_price', 0)
 
-        if (yes5_price > 0.9) or (no5_price > 0.9):
+        if (yes5_price == 0.98) or (no5_price == 0.98):
             self.reset_trade_count = 0
         else:
             self.reset_trade_count += 1
@@ -3251,6 +3252,7 @@ class CryptoTrader:
             coins = [coin_type]
             for coin in coins:
                 try:  # 为每个币种添加单独的异常处理
+                    
                     coin_new_weekly_url = self.find_new_weekly_url(coin)
                     
                     if coin_new_weekly_url:
@@ -3285,6 +3287,7 @@ class CryptoTrader:
         try:
             if self.trading:
                 return
+
             # 保存当前窗口句柄作为局部变量，用于本方法内部使用
             original_tab = self.driver.current_window_handle
             
