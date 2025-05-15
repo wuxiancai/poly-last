@@ -344,7 +344,7 @@ class CryptoTrader:
         ttk.Label(initial_frame, text="Initial").pack(side=tk.LEFT)
         self.initial_amount_entry = ttk.Entry(initial_frame, width=2)
         self.initial_amount_entry.pack(side=tk.LEFT)
-        self.initial_amount_entry.insert(0, "2")
+        self.initial_amount_entry.insert(0, "1.5")
         
         # 反水一次设置
         first_frame = ttk.Frame(amount_frame)
@@ -1563,7 +1563,7 @@ class CryptoTrader:
             # 使用 XPath 定位并点击 google 按钮
             google_button = self._find_element_with_retry(XPathConfig.LOGIN_WITH_GOOGLE_BUTTON, timeout=3, silent=True)
             google_button.click()
-            time.sleep(3)
+            time.sleep(15)
 
             if not self.find_login_button():
                 self.logger.info("\033[34m✅ 登录成功\033[0m")
@@ -2289,7 +2289,7 @@ class CryptoTrader:
         
         self.sell_count = 0
         self.trade_count = 0
-        # 重置Yes1和No1价格为0.52
+        # 重置Yes1和No1价格为0.53
         self.set_yes_no_default_target_price()
         self.reset_count_label.config(text=str(self.reset_trade_count))
         self.logger.info(f"第\033[32m{self.reset_trade_count}\033[0m次重置交易")
@@ -3226,7 +3226,7 @@ class CryptoTrader:
         now = datetime.now()
         self.logger.info(f"当前时间: {now}")
         # 计算下一个3点2分的时间
-        next_run = now.replace(hour=0, minute=15, second=0, microsecond=0)
+        next_run = now.replace(hour=0, minute=31, second=0, microsecond=0)
         if now >= next_run:
             next_run += timedelta(days=1)
         
