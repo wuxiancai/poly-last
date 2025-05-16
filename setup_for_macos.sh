@@ -51,7 +51,7 @@ brew update
 echo "安装 Python 3.9..."
 brew install python@3.9 --force
 brew link --force --overwrite python@3.9
-# 安装 python-tk@3.9 (自动模式)
+echo "安装 python-tk@3.9 (自动模式)"
 brew install python-tk@3.9 --force
 brew install wget
 
