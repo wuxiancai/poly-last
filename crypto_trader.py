@@ -34,6 +34,7 @@ import logging
 from xpath_config import XPathConfig
 from threading import Thread
 import random
+import requests
 
 class Logger:
     def __init__(self, name):
@@ -470,12 +471,30 @@ class CryptoTrader:
         pair_container = ttk.Frame(pair_frame)
         pair_container.pack(anchor="center")
         
-        # 交易币种及日期，颜色为蓝色
+        # 交易币种及日期，颜色为黑色
         ttk.Label(pair_container, text="Crypto:", 
-                 font=('Arial', 14), foreground='blue').pack(side=tk.LEFT, padx=5)
+                 font=('Arial', 14), foreground='black').pack(side=tk.LEFT, padx=2)
         self.trading_pair_label = ttk.Label(pair_container, text="--", 
-                                        font=('Arial', 16, 'bold'), foreground='blue')
-        self.trading_pair_label.pack(side=tk.LEFT, padx=5)
+                                        font=('Arial', 16, 'bold'), foreground='black')
+        self.trading_pair_label.pack(side=tk.LEFT, padx=2)
+
+        # 币安价格显示区域
+        binance_frame = ttk.Frame(pair_frame)
+        binance_frame.pack(anchor="center")
+
+        # 币安零点时价格显示
+        ttk.Label(binance_frame, text="Binance 00:00 Price:", 
+                 font=('Arial', 14), foreground='blue').pack(side=tk.LEFT, padx=2)
+        self.binance_zero_price_label = ttk.Label(binance_frame, text="0.00", 
+                                        font=('Arial', 16, 'bold'), foreground='red')
+        self.binance_zero_price_label.pack(side=tk.LEFT, padx=2)
+
+        # 币安实时价格显示
+        ttk.Label(binance_frame, text="Binance Now Price:", 
+                 font=('Arial', 14), foreground='blue').pack(side=tk.LEFT, padx=2)
+        self.binance_now_price_label = ttk.Label(binance_frame, text="0.00", 
+                                        font=('Arial', 16, 'bold'), foreground='red')
+        self.binance_now_price_label.pack(side=tk.LEFT, padx=2)
         
         # 修改实时价格显示区域
         price_frame = ttk.LabelFrame(scrollable_frame, text="Price and Shares", padding=(5, 5))
@@ -804,7 +823,10 @@ class CryptoTrader:
         self.root.after(4000, self.start_url_monitoring)
         # 启动自动切换url
         self.root.after(90000, self.schedule_auto_find_coin)
-
+        # 启动币安零点时价格监控
+        self.root.after(6000, self.get_binance_price)
+        # 启动币安实时价格监控
+        self.root.after(11000, self.get_now_price)
         # 启动 XPath 监控
         self.monitor_xpath_timer = self.root.after(120000, self.monitor_xpath_elements)
 
@@ -3462,7 +3484,64 @@ class CryptoTrader:
             self.logger.error(f"查找并点击今天日期卡片失败: {str(e)}")
             return False
 
-
+    def get_binance_price(self):
+        """获取币安BTC实时价格,并在中国时区00:00触发"""
+        self.logger.info(f"✅ 获取币安 \033[34m{self.coin_combobox.get()}USDT\033[0m 价格")
+        try:
+            # 获取当前币安BTC价格
+            selected_coin = self.coin_combobox.get()
+            coin = selected_coin + 'USDT'
+            response = requests.get(f'https://api.binance.com/api/v3/ticker/price?symbol={coin}')
+            if response.status_code == 200:
+                data = response.json()
+                price = round(float(data['price']),2)
+                self.last_coin_price = price
+                self.logger.info(f"✅ 币安 {coin} 价格: \033[34m{price}\033[0m")
+                self.binance_zero_price_label.config(text=price)
+                return price
+            else:
+                self.logger.error(f"❌ 获取币安价格失败: HTTP {response.status_code}")
+        except Exception as e:
+            self.logger.error(f"❌ 获取币安价格异常: {str(e)}")
+        finally:
+            # 计算下一个00:00的时间
+            now = datetime.now()
+            tomorrow = now.replace(hour=0, minute=0, second=10, microsecond=0) + timedelta(days=1)
+            seconds_until_midnight = (tomorrow - now).total_seconds()
+            # 取消已有的定时器（如果存在）
+            if hasattr(self, 'binance_price_timer') and self.binance_price_timer:
+                self.binance_price_timer.cancel()
+            # 设置下一次执行的定时器
+            if self.running and not self.stop_event.is_set():
+                self.binance_price_timer = threading.Timer(seconds_until_midnight, self.get_binance_price)
+                self.binance_price_timer.daemon = True
+                self.binance_price_timer.start()
+                self.logger.info(f"{round(seconds_until_midnight / 3600,2)}小时后再次获取价格")
+    
+    def get_now_price(self):
+        """获取当前价格"""
+        # 获取当前币安价格
+        try:
+            selected_coin = self.coin_combobox.get()
+            coin = selected_coin + 'USDT'
+            response = requests.get(f'https://api.binance.com/api/v3/ticker/price?symbol={coin}')
+            if response.status_code == 200:
+                data = response.json()
+                price = round(float(data['price']),2)
+                self.binance_now_price_label.config(text=price)
+            
+        except Exception as e:
+            self.logger.info(f"❌ 获取币安价格异常: {str(e)}")
+        finally:
+            # 取消已有的定时器（如果存在）
+            if hasattr(self, 'get_now_price_timer') and self.get_now_price_timer:
+                self.get_now_price_timer.cancel()
+            # 设置下一次执行的定时器
+            if self.running and not self.stop_event.is_set():
+                self.get_now_price_timer = threading.Timer(10, self.get_now_price)
+                self.get_now_price_timer.daemon = True
+                self.get_now_price_timer.start()
+                
     def run(self):
         """启动程序"""
         try:

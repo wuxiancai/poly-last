@@ -67,6 +67,7 @@ echo "安装依赖..."
 pip3 install --no-cache-dir selenium
 pip3 install --no-cache-dir pyautogui
 pip3 install --no-cache-dir screeninfo
+pip3 install --no-cache-dir requests
 # pip3 install --no-cache-dir pytesseract
 # pip3 install --no-cache-dir opencv-python-headless  # 安装headless版本，通常更稳定
 
