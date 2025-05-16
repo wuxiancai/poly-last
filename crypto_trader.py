@@ -2622,7 +2622,7 @@ class CryptoTrader:
         """
         max_retries = 3
         retry_delay = 2
-        
+        time.sleep(2)
         for attempt in range(max_retries):
             try:
                 # 首先验证浏览器状态
@@ -2668,7 +2668,7 @@ class CryptoTrader:
         """
         max_retries = 3
         retry_delay = 2
-        
+        time.sleep(2)
         for attempt in range(max_retries):
             try:
                 # 首先验证浏览器状态
@@ -2713,9 +2713,8 @@ class CryptoTrader:
         """
         max_retries = 2
         retry_delay = 1
-        time.sleep(1)
+        time.sleep(2)
         for attempt in range(max_retries):
-            
             try:
                 # 首先验证浏览器状态
                 if not self.driver:
@@ -2760,7 +2759,7 @@ class CryptoTrader:
         """
         max_retries = 2
         retry_delay = 1
-        time.sleep(1)
+        time.sleep(2)
         for attempt in range(max_retries):
             try:
                 # 首先验证浏览器状态
