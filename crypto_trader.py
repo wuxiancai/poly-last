@@ -1667,7 +1667,7 @@ class CryptoTrader:
                 # 检查Yes1价格匹配
                 if 0 <= round((asks_price - yes1_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info("Up 1价格匹配,执行自动交易")
+                        self.logger.info(f"Up 1:{asks_price}价格匹配,执行自动交易")
                         # 执行现有的交易操作
                         self.amount_yes1_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -1728,7 +1728,7 @@ class CryptoTrader:
                 # 检查No1价格匹配
                 elif 0 <= round((1 - bids_price) - no1_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                      while True:
-                        self.logger.info("Down 1价格匹配,执行自动交易") 
+                        self.logger.info(f"Down 1:{1 - bids_price}价格匹配,执行自动交易") 
                         # 执行现有的交易操作
                         self.buy_no_button.invoke()
                         time.sleep(0.5)
@@ -1810,7 +1810,7 @@ class CryptoTrader:
                 # 检查Yes2价格匹配
                 if 0 <= round((asks_price - yes2_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info("Up 2价格匹配,执行自动交易")
+                        self.logger.info(f"Up 2:{asks_price}价格匹配,执行自动交易")
                         # 执行现有的交易操作
                         self.amount_yes2_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -1860,7 +1860,7 @@ class CryptoTrader:
                 # 检查No2价格匹配
                 elif 0 <= round((1 - bids_price) - no2_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info("Down 2价格匹配,执行自动交易")
+                        self.logger.info(f"Down 2:{1 - bids_price}价格匹配,执行自动交易")
                         
                         # 执行现有的交易操作
                         self.buy_no_button.invoke()
@@ -1932,7 +1932,7 @@ class CryptoTrader:
                 # 检查Yes3价格匹配
                 if 0 <= round((asks_price - yes3_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info("Up 3价格匹配,执行自动交易")
+                        self.logger.info(f"Up 3:{asks_price}价格匹配,执行自动交易")
                         # 执行交易操作
                         self.amount_yes3_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -1982,7 +1982,7 @@ class CryptoTrader:
                 # 检查No3价格匹配
                 elif 0 <= round((1 - bids_price) - no3_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info("Down 3价格匹配,执行自动交易")
+                        self.logger.info(f"Down 3:{1 - bids_price}价格匹配,执行自动交易")
                         # 执行交易操作
                         self.buy_no_button.invoke()
                         time.sleep(0.5)
@@ -2054,7 +2054,7 @@ class CryptoTrader:
                 # 检查Yes4价格匹配
                 if 0 <= round((asks_price - yes4_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info("Up 4价格匹配,执行自动交易")
+                        self.logger.info(f"Up 4:{asks_price}价格匹配,执行自动交易")
                         # 执行交易操作
                         self.amount_yes4_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -2106,7 +2106,7 @@ class CryptoTrader:
                 # 检查No4价格匹配
                 elif 0 <= round((1 - bids_price) - no4_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info("Down 4价格匹配,执行自动交易")
+                        self.logger.info(f"Down 4:{1 - bids_price}价格匹配,执行自动交易")
                         # 执行交易操作
                         self.buy_no_button.invoke()
                         time.sleep(0.5)
@@ -2179,8 +2179,8 @@ class CryptoTrader:
                 self.trading = True  # 开始交易
 
                 # 检查Yes5价格匹配
-                if 0 <= round((bids_price - yes5_price), 2) <= self.price_premium and (bids_shares > self.bids_shares):
-                    self.logger.info("Up 5价格匹配,执行自动卖出")
+                if 0 <= round((bids_price - yes5_price), 2) <= 0.01 and (bids_shares > self.bids_shares):
+                    self.logger.info(f"Up 5:{asks_price}价格匹配,执行自动卖出")
                     
                     self.yes5_target_price = yes5_price
                             
@@ -2233,8 +2233,8 @@ class CryptoTrader:
                 self.trading = True  # 开始交易
             
                 # 检查No5价格匹配
-                if 0 <= round(1 - asks_price - no5_price, 2) <= self.price_premium and (bids_shares > self.bids_shares):
-                    self.logger.info("Down 5价格匹配,执行自动卖出")
+                if 0 <= round(1 - asks_price - no5_price, 2) <= 0.01 and (bids_shares > self.bids_shares):
+                    self.logger.info(f"Down 5:{1 - asks_price}价格匹配,执行自动卖出")
 
                     self.no5_target_price = no5_price
                     
@@ -2311,7 +2311,6 @@ class CryptoTrader:
         if self.Verify_sold_yes():
              # 增加卖出计数
             self.sell_count += 1
-            
             # 发送交易邮件 - 卖出YES
             self.send_trade_email(
                 trade_type="Sell Up",
@@ -2597,6 +2596,7 @@ class CryptoTrader:
                 no1_amount_entry = self.no_frame.grid_slaves(row=1, column=1)[0]
                 amount = no1_amount_entry.get()
             elif button_text == "Amount-N2":
+
                 no2_amount_entry = self.no_frame.grid_slaves(row=3, column=1)[0]
                 amount = no2_amount_entry.get()
             elif button_text == "Amount-N3":
@@ -3234,6 +3234,8 @@ class CryptoTrader:
         wait_time = (next_run - now).total_seconds() * 1000
         wait_time_hours = wait_time / 3600000
         
+
+
         # 设置定时器
         selected_coin = self.coin_combobox.get()
         self.root.after(int(wait_time), lambda: self.find_54_coin(selected_coin))
