@@ -3538,7 +3538,7 @@ class CryptoTrader:
                 self.get_now_price_timer.cancel()
             # 设置下一次执行的定时器
             if self.running and not self.stop_event.is_set():
-                self.get_now_price_timer = threading.Timer(10, self.get_now_price)
+                self.get_now_price_timer = threading.Timer(60, self.get_now_price)
                 self.get_now_price_timer.daemon = True
                 self.get_now_price_timer.start()
                 
