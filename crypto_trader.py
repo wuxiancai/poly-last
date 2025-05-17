@@ -821,7 +821,7 @@ class CryptoTrader:
         self.root.after(8000, self.start_login_monitoring)
         # 启动URL监控
         self.root.after(4000, self.start_url_monitoring)
-        # 启动自动切换url
+        # 启动自动找币
         self.root.after(90000, self.schedule_auto_find_coin)
         # 启动币安零点时价格监控
         self.root.after(6000, self.get_binance_price)
@@ -1623,7 +1623,7 @@ class CryptoTrader:
                 if self.running and self.driver and not self.trading:
                     self.driver.refresh()
                     refresh_time = self.refresh_interval / 60000
-                    self.logger.info(f"\033[34m{refresh_time} 分钟后再次刷新\033[0m")      
+                    self.logger.info(f"\033[34m{round(refresh_time, 2)} 分钟后再次刷新\033[0m")      
                 else:
                     self.logger.info("刷新失败")
                     self.logger.info(f"trading={self.trading}")
@@ -3245,9 +3245,8 @@ class CryptoTrader:
     def schedule_auto_find_coin(self):
         """安排每天1点2分执行自动找币"""
         now = datetime.now()
-        self.logger.info(f"当前时间: {now}")
         # 计算下一个3点2分的时间
-        next_run = now.replace(hour=0, minute=31, second=0, microsecond=0)
+        next_run = now.replace(hour=9, minute=23, second=0, microsecond=0)
         if now >= next_run:
             next_run += timedelta(days=1)
         
@@ -3260,7 +3259,7 @@ class CryptoTrader:
         # 设置定时器
         selected_coin = self.coin_combobox.get()
         self.root.after(int(wait_time), lambda: self.find_54_coin(selected_coin))
-        self.logger.info(f"{wait_time_hours} 小时后,开始自动找币")
+        self.logger.info(f"{round(wait_time_hours,2)} 小时后,开始自动找币")
 
     def find_54_coin(self,coin_type):
         """自动找币"""
@@ -3334,16 +3333,8 @@ class CryptoTrader:
                 search_text = 'Ethereum Up or Down on'
             elif coin == 'SOL':
                 search_text = 'Solana Up or Down on'
-            else:
-                search_text = ''
             
-            if not search_text:
-                self.logger.error(f"无效的币种: {coin}")
-                # 关闭搜索标签页
-                self.driver.close()
-                # 切换回原始窗口
-                self.driver.switch_to.window(original_tab)
-                return None
+            
             try:
                 # 使用确定的XPath查找搜索框
                 try:
@@ -3361,8 +3352,9 @@ class CryptoTrader:
                 # 清除搜索框并输入搜索词
                 search_box.clear()
                 search_box.send_keys(search_text)
-                # time.sleep(1)  # 等待搜索词输入完成
-                
+                time.sleep(0.5)
+                # 把搜索词保存到self.search_text
+                self.search_text = search_text
                 # 按ENTER键开始搜索
                 actions.send_keys(Keys.RETURN).perform()
                 time.sleep(2)  # 等待搜索结果加载
@@ -3461,10 +3453,18 @@ class CryptoTrader:
             self.logger.info(f"🔍 查找包含日期 [{today_str}] 的链接...")
 
             # 获取所有含 "Bitcoin Up or Down on" 的卡片元素
-            cards = self.driver.find_elements(By.XPATH, XPathConfig.SEARCH_CONFIRM_BUTTON[0])
+            try:
+                cards = self.driver.find_elements(By.XPATH, XPathConfig.SEARCH_CONFIRM_BUTTON[0])
+            except NoSuchElementException:
+                cards = self._find_element_with_retry(
+                    XPathConfig.SEARCH_CONFIRM_BUTTON,
+                    timeout=3,
+                    silent=True
+                )
 
             for card in cards:
-                if today_str in card.text:
+                expected_text = self.search_text + " " + today_str + "?"
+                if card.text.strip() == expected_text:
                     self.logger.info(f"\033[34m✅ 找到包含日期的卡片: {card.text.strip()}\033[0m")
 
                     # Command 键（macOS）或 Control 键（Windows/Linux）
@@ -3482,7 +3482,7 @@ class CryptoTrader:
 
         except Exception as e:
             self.logger.error(f"查找并点击今天日期卡片失败: {str(e)}")
-            return False
+            self.click_today_card()
 
     def get_binance_price(self):
         """获取币安BTC实时价格,并在中国时区00:00触发"""
