@@ -2649,7 +2649,11 @@ class CryptoTrader:
             try:
                 # 首先验证浏览器状态
                 if not self.driver:
-                    self.restart_browser()            # 等待并检查是否存在 Yes 交易记录
+                    self.restart_browser()
+                
+                if self.find_login_button():
+                    self.check_and_handle_login()
+
                 try:
                     yes_element = self.driver.find_element(By.XPATH, XPathConfig.HISTORY[0])
                 except NoSuchElementException:
@@ -2696,6 +2700,8 @@ class CryptoTrader:
                 # 首先验证浏览器状态
                 if not self.driver:
                     self.restart_browser()
+                if self.find_login_button():
+                    self.check_and_handle_login()
                 # 等待并检查是否存在 No 标签
                 try:
                     no_element = self.driver.find_element(By.XPATH, XPathConfig.HISTORY[0])
@@ -2740,7 +2746,9 @@ class CryptoTrader:
             try:
                 # 首先验证浏览器状态
                 if not self.driver:
-                    self.restart_browser()            # 等待并检查是否存在 Yes 交易记录
+                    self.restart_browser()  
+                if self.find_login_button():
+                    self.check_and_handle_login()          # 等待并检查是否存在 Yes 交易记录
                 try:
                     yes_element = self.driver.find_element(By.XPATH, XPathConfig.HISTORY[0])
                 except NoSuchElementException:
@@ -2786,7 +2794,9 @@ class CryptoTrader:
             try:
                 # 首先验证浏览器状态
                 if not self.driver:
-                    self.restart_browser()            # 等待并检查是否存在 No 交易记录
+                    self.restart_browser()
+                if self.find_login_button():
+                    self.check_and_handle_login()            # 等待并检查是否存在 No 交易记录
                 try:
                     no_element = self.driver.find_element(By.XPATH, XPathConfig.HISTORY[0])
                 except NoSuchElementException:
@@ -3246,7 +3256,7 @@ class CryptoTrader:
         """安排每天1点2分执行自动找币"""
         now = datetime.now()
         # 计算下一个3点2分的时间
-        next_run = now.replace(hour=0, minute=23, second=0, microsecond=0)
+        next_run = now.replace(hour=0, minute=10, second=0, microsecond=0)
         if now >= next_run:
             next_run += timedelta(days=1)
         
