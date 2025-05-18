@@ -3262,7 +3262,7 @@ class CryptoTrader:
         """安排每天1点2分执行自动找币"""
         now = datetime.now()
         # 计算下一个3点2分的时间
-        next_run = now.replace(hour=0, minute=10, second=0, microsecond=0)
+        next_run = now.replace(hour=1, minute=10, second=0, microsecond=0)
         if now >= next_run:
             next_run += timedelta(days=1)
         
