@@ -369,14 +369,14 @@ class CryptoTrader:
         ttk.Label(profit_frame, text="Margin").pack(side=tk.LEFT)
         self.profit_rate_entry = ttk.Entry(profit_frame, width=4)
         self.profit_rate_entry.pack(side=tk.LEFT)
-        self.profit_rate_entry.insert(0, "1.5%")
+        self.profit_rate_entry.insert(0, "1.3%")
 
         # 翻倍天数
         weeks_frame = ttk.Frame(amount_frame)
         weeks_frame.pack(side=tk.LEFT, padx=2)
         self.doubling_weeks_entry = ttk.Entry(weeks_frame, width=2, style='Red.TEntry')
         self.doubling_weeks_entry.pack(side=tk.LEFT)
-        self.doubling_weeks_entry.insert(0, "44")
+        self.doubling_weeks_entry.insert(0, "53")
         ttk.Label(weeks_frame, text="Day's Double", style='Red.TLabel').pack(side=tk.LEFT)
 
         # 配置列权重使输入框均匀分布
@@ -817,7 +817,11 @@ class CryptoTrader:
         # 启动页面刷新
         self.root.after(40000, self.refresh_page)
         self.logger.info("\033[34m✅ 启动页面刷新成功!\033[0m")
-        
+
+        # 检查是否登录
+        if self.find_login_button():
+            self.check_and_handle_login()
+
         # 启动URL监控
         self.root.after(4000, self.start_url_monitoring)
         # 启动自动找币
@@ -1726,11 +1730,11 @@ class CryptoTrader:
                             # 设置 Yes5和No5价格为0.98
                             self.yes5_price_entry = self.yes_frame.grid_slaves(row=8, column=1)[0]
                             self.yes5_price_entry.delete(0, tk.END)
-                            self.yes5_price_entry.insert(0, "0.98")
+                            self.yes5_price_entry.insert(0, "0.99")
                             self.yes5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.no5_price_entry = self.no_frame.grid_slaves(row=8, column=1)[0]
                             self.no5_price_entry.delete(0, tk.END)
-                            self.no5_price_entry.insert(0, "0.98")
+                            self.no5_price_entry.insert(0, "0.99")
                             self.no5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.logger.info("\033[34m✅ First_trade执行成功\033[0m")
                             self.root.after(30000, self.driver.refresh)
@@ -1789,11 +1793,11 @@ class CryptoTrader:
                             # 设置 Yes5和No5价格为0.98
                             self.yes5_price_entry = self.yes_frame.grid_slaves(row=8, column=1)[0]
                             self.yes5_price_entry.delete(0, tk.END)
-                            self.yes5_price_entry.insert(0, "0.98")
+                            self.yes5_price_entry.insert(0, "0.99")
                             self.yes5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.no5_price_entry = self.no_frame.grid_slaves(row=8, column=1)[0]
                             self.no5_price_entry.delete(0, tk.END)
-                            self.no5_price_entry.insert(0, "0.98")
+                            self.no5_price_entry.insert(0, "0.99")
                             self.no5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.logger.info("\033[34m✅ First_trade执行成功\033[0m")
                             self.root.after(30000, self.driver.refresh)
@@ -2102,7 +2106,7 @@ class CryptoTrader:
                             # 设置 Yes5和No5价格为0.85
                             self.yes5_price_entry = self.yes_frame.grid_slaves(row=8, column=1)[0]
                             self.yes5_price_entry.delete(0, tk.END)
-                            self.yes5_price_entry.insert(0, "0.98")
+                            self.yes5_price_entry.insert(0, "0.99")
                             self.yes5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.no5_price_entry = self.no_frame.grid_slaves(row=8, column=1)[0]
                             self.no5_price_entry.delete(0, tk.END)
@@ -2159,7 +2163,7 @@ class CryptoTrader:
                             self.yes5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.no5_price_entry = self.no_frame.grid_slaves(row=8, column=1)[0]
                             self.no5_price_entry.delete(0, tk.END)
-                            self.no5_price_entry.insert(0, "0.98")
+                            self.no5_price_entry.insert(0, "0.99")
                             self.no5_price_entry.configure(foreground='red')  # 添加红色设置
                             self.buy_no4_amount = float(self.no4_amount_entry.get())
                             # 增加交易次数
@@ -2192,6 +2196,8 @@ class CryptoTrader:
         try:
             if not self.driver:
                 self.restart_browser()
+            if self.find_login_button():
+                self.check_and_handle_login()
                 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
 
@@ -2246,7 +2252,9 @@ class CryptoTrader:
         """当NO4价格等于实时No价格时自动卖出"""
         try:
             if not self.driver:
-                self.restart_browser()  
+                self.restart_browser()
+            if self.find_login_button():
+                self.check_and_handle_login()
 
             asks_price, bids_price, asks_shares, bids_shares = self.get_nearby_cents()
             
@@ -3458,9 +3466,7 @@ class CryptoTrader:
         try:
             # 获取当前日期字符串，比如 "April 18"
             today_str = datetime.now().strftime("%B %-d")  # macOS/Linux
-            if sys.platform == 'win32':
-                today_str = datetime.now().strftime("%B %#d")  # Windows 专用
-
+            
             self.logger.info(f"🔍 查找包含日期 [{today_str}] 的链接...")
 
             # 获取所有含 "Bitcoin Up or Down on" 的卡片元素
