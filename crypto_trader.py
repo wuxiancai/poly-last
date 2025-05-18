@@ -819,9 +819,7 @@ class CryptoTrader:
         self.logger.info("\033[34m✅ 启动页面刷新成功!\033[0m")
 
         # 检查是否登录
-        if self.find_login_button():
-            self.check_and_handle_login()
-
+        self.root.after(10000, self.start_login_monitoring)
         # 启动URL监控
         self.root.after(4000, self.start_url_monitoring)
         # 启动自动找币
@@ -1145,8 +1143,7 @@ class CryptoTrader:
 
             if not self.driver:
                 self.restart_browser()
-            if self.find_login_button:
-                self.check_and_handle_login() 
+            
    
             # 添加URL检查
             target_url = self.url_entry.get()
@@ -1694,7 +1691,7 @@ class CryptoTrader:
                 # 检查Yes1价格匹配
                 if 0 <= round((asks_price - yes1_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info(f"Up 1:{asks_price}价格匹配,执行自动交易")
+                        self.logger.info(f"Up 1:\033[34m{round(asks_price, 2)}\033[0m价格匹配,执行自动交易")
                         # 执行现有的交易操作
                         self.amount_yes1_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -1755,7 +1752,7 @@ class CryptoTrader:
                 # 检查No1价格匹配
                 elif 0 <= round((1 - bids_price) - no1_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                      while True:
-                        self.logger.info(f"Down 1:{1 - bids_price}价格匹配,执行自动交易") 
+                        self.logger.info(f"Down 1:\033[34m{round(1 - bids_price, 2)}\033[0m价格匹配,执行自动交易") 
                         # 执行现有的交易操作
                         self.buy_no_button.invoke()
                         time.sleep(0.5)
@@ -1837,7 +1834,7 @@ class CryptoTrader:
                 # 检查Yes2价格匹配
                 if 0 <= round((asks_price - yes2_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info(f"Up 2:{asks_price}价格匹配,执行自动交易")
+                        self.logger.info(f"Up 2:\033[34m{round(asks_price, 2)}\033[0m价格匹配,执行自动交易")
                         # 执行现有的交易操作
                         self.amount_yes2_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -1887,7 +1884,7 @@ class CryptoTrader:
                 # 检查No2价格匹配
                 elif 0 <= round((1 - bids_price) - no2_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info(f"Down 2:{1 - bids_price}价格匹配,执行自动交易")
+                        self.logger.info(f"Down 2:\033[34m{round(1 - bids_price, 2)}\033[0m价格匹配,执行自动交易")
                         
                         # 执行现有的交易操作
                         self.buy_no_button.invoke()
@@ -1959,7 +1956,7 @@ class CryptoTrader:
                 # 检查Yes3价格匹配
                 if 0 <= round((asks_price - yes3_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info(f"Up 3:{asks_price}价格匹配,执行自动交易")
+                        self.logger.info(f"Up 3:\033[34m{round(asks_price, 2)}\033[0m价格匹配,执行自动交易")
                         # 执行交易操作
                         self.amount_yes3_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -2009,7 +2006,7 @@ class CryptoTrader:
                 # 检查No3价格匹配
                 elif 0 <= round((1 - bids_price) - no3_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info(f"Down 3:{1 - bids_price}价格匹配,执行自动交易")
+                        self.logger.info(f"Down 3:\033[34m{round(1 - bids_price, 2)}\033[0m价格匹配,执行自动交易")
                         # 执行交易操作
                         self.buy_no_button.invoke()
                         time.sleep(0.5)
@@ -2081,7 +2078,7 @@ class CryptoTrader:
                 # 检查Yes4价格匹配
                 if 0 <= round((asks_price - yes4_price), 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info(f"Up 4:{asks_price}价格匹配,执行自动交易")
+                        self.logger.info(f"Up 4:\033[34m{round(asks_price, 2)}\033[0m价格匹配,执行自动交易")
                         # 执行交易操作
                         self.amount_yes4_button.event_generate('<Button-1>')
                         time.sleep(0.5)
@@ -2133,7 +2130,7 @@ class CryptoTrader:
                 # 检查No4价格匹配
                 elif 0 <= round((1 - bids_price) - no4_price, 2) <= self.price_premium and (asks_shares > self.asks_shares):
                     while True:
-                        self.logger.info(f"Down 4:{1 - bids_price}价格匹配,执行自动交易")
+                        self.logger.info(f"Down 4:\033[34m{round(1 - bids_price, 2)}\033[0m价格匹配,执行自动交易")
                         # 执行交易操作
                         self.buy_no_button.invoke()
                         time.sleep(0.5)
@@ -2209,7 +2206,7 @@ class CryptoTrader:
 
                 # 检查Yes5价格匹配
                 if 0 <= round((bids_price - yes5_price), 2) <= 0.01 and (bids_shares > self.bids_shares):
-                    self.logger.info(f"Up 5:{asks_price}价格匹配,执行自动卖出")
+                    self.logger.info(f"Up 5:\033[34m{round(asks_price, 2)}\033[0m价格匹配,执行自动卖出")
                     
                     self.yes5_target_price = yes5_price
                             
@@ -2265,7 +2262,7 @@ class CryptoTrader:
             
                 # 检查No5价格匹配
                 if 0 <= round(1 - asks_price - no5_price, 2) <= 0.01 and (bids_shares > self.bids_shares):
-                    self.logger.info(f"Down 5:{1 - asks_price}价格匹配,执行自动卖出")
+                    self.logger.info(f"Down 5:\033[34m{round(1 - asks_price, 2)}\033[0m价格匹配,执行自动卖出")
 
                     self.no5_target_price = no5_price
                     
@@ -3206,7 +3203,7 @@ class CryptoTrader:
             excluded_attrs = ['ACCEPT_BUTTON', 'LOGIN_BUTTON', 'LOGIN_WITH_GOOGLE_BUTTON','HISTORY',
                               'POSITION_SELL_BUTTON', 'POSITION_SELL_YES_BUTTON', 'POSITION_SELL_NO_BUTTON',
                               'POSITION_UP_LABEL', 'POSITION_DOWN_LABEL', 'POSITION_YES_VALUE', 'POSITION_NO_VALUE',
-                              'SEARCH_CONFIRM_BUTTON','SEARCH_INPUT'
+                              'SEARCH_CONFIRM_BUTTON','SEARCH_INPUT','SPREAD'
                               ]
             # 获取所有 XPath 属性，排除指定的属性
             xpath_attrs = [attr for attr in dir(xpath_config) 
