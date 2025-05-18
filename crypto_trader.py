@@ -817,8 +817,7 @@ class CryptoTrader:
         # 启动页面刷新
         self.root.after(40000, self.refresh_page)
         self.logger.info("\033[34m✅ 启动页面刷新成功!\033[0m")
-        # 启动登录状态监控
-        self.root.after(8000, self.start_login_monitoring)
+        
         # 启动URL监控
         self.root.after(4000, self.start_url_monitoring)
         # 启动自动找币
@@ -1142,7 +1141,9 @@ class CryptoTrader:
 
             if not self.driver:
                 self.restart_browser()
-                
+            if self.find_login_button:
+                self.check_and_handle_login() 
+   
             # 添加URL检查
             target_url = self.url_entry.get()
             current_url = self.driver.current_url
